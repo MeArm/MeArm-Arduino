@@ -65,10 +65,10 @@ void loop() {
   else if (cc.button_a() || cc.shoulder_right() > 16)
     arm.closeGripper();
   if (cc.button_home()) {
-    arm.gotoPoint(0, 100, 50);
+    arm.moveTo(0, 100, 50);
   } 
   if (!(dx == 0 && dy == 0 && dz == 0))
-    arm.goDirectlyTo(arm.getX() + dx, arm.getY() + dy, arm.getZ() + dz);
+    arm.snapTo(arm.getX() + dx, arm.getY() + dy, arm.getZ() + dz);
   
   delay(50);
 }

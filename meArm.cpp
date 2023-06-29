@@ -4,9 +4,9 @@
  *   meArm arm;
  *   arm.begin(1, 10, 9, 6);
  *   arm.openGripper();
- *   arm.gotoPoint(-80, 100, 140);
+ *   arm.moveTo(-80, 100, 140);
  *   arm.closeGripper();
- *   arm.gotoPoint(70, 200, 10);
+ *   arm.moveTo(70, 200, 10);
  *   arm.openGripper();
  */
 #include <Arduino.h>
@@ -61,8 +61,8 @@ void meArm::begin(int pinBase, int pinShoulder, int pinElbow, int pinGripper) {
   _elbow.attach(_pinElbow);
   _gripper.attach(_pinGripper);
 
-  //goDirectlyTo(0, 100, 50);
-  goDirectlyToCylinder(0, 100, 50);
+  //snapTo(0, 100, 50);
+  snapToCylinder(0, 100, 50);
   openGripper();
 }
 
@@ -74,7 +74,7 @@ void meArm::end() {
 }
 
 //Set servos to reach a certain point directly without caring how we get there 
-void meArm::goDirectlyTo(float x, float y, float z) {
+void meArm::snapTo(float x, float y, float z) {
   float radBase,radShoulder,radElbow;
   if (solve(x, y, z, radBase, radShoulder, radElbow)) {
     _base.write(angle2pwm(_svoBase,radBase));
@@ -85,7 +85,7 @@ void meArm::goDirectlyTo(float x, float y, float z) {
 }
 
 //Travel smoothly from current point to another point
-void meArm::gotoPoint(float x, float y, float z) {
+void meArm::moveTo(float x, float y, float z) {
   //Starting points - current pos
   float x0 = _x; 
   float y0 = _y; 
@@ -93,10 +93,10 @@ void meArm::gotoPoint(float x, float y, float z) {
   float dist = sqrt((x0-x)*(x0-x)+(y0-y)*(y0-y)+(z0-z)*(z0-z));
   int step = 10;
   for (int i = 0; i<dist; i+= step) {
-    goDirectlyTo(x0 + (x-x0)*i/dist, y0 + (y-y0) * i/dist, z0 + (z-z0) * i/dist);
+    snapTo(x0 + (x-x0)*i/dist, y0 + (y-y0) * i/dist, z0 + (z-z0) * i/dist);
     delay(50);
   }
-  goDirectlyTo(x, y, z);
+  snapTo(x, y, z);
   delay(50);
 }
 
@@ -109,16 +109,16 @@ void meArm::polarToCartesian(float theta, float r, float& x, float& y){
 }
 
 //Same as above but for cylindrical polar coodrinates
-void meArm::gotoPointCylinder(float theta, float r, float z){
+void meArm::moveToCylinder(float theta, float r, float z){
     float x, y;
     polarToCartesian(theta, r, x, y);
-    gotoPoint(x,y,z);
+    moveTo(x,y,z);
 }
 
-void meArm::goDirectlyToCylinder(float theta, float r, float z){
+void meArm::snapToCylinder(float theta, float r, float z){
     float x, y;
     polarToCartesian(theta, r, x, y);
-    goDirectlyTo(x,y,z);
+    snapTo(x,y,z);
 }
 
 //Check to see if possible

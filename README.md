@@ -32,13 +32,13 @@ void setup() {
 
 void loop() {
   //Go up and left to grab something
-  arm.gotoPoint(-80,100,140); 
+  arm.moveTo(-80,100,140); 
   arm.closeGripper();
   //Go down, forward and right to drop it
-  arm.gotoPoint(70,200,10);
+  arm.moveTo(70,200,10);
   arm.openGripper();
   //Back to start position
-  arm.gotoPoint(0,100,50);
+  arm.moveTo(0,100,50);
 }
 ```
 
@@ -56,8 +56,8 @@ Class methods of meArm object
 * void begin(int pinBase, int pinShoulder, int pinElbow, int pinGripper) - The four PWM-capable pins used to drive the servos.  Begin must be called in setup() before any other calls to the meArm instance are made.
 * void openGripper() - opens the gripper, letting go of anything it was holding
 * void closeGripper() - closes the gripper, perhaps grabbing and holding something as it does so
-* void gotoPoint(float x, float y, float z) - move in a straight line from the current point to the requested position
-* void goDirectlyTo(float x, float y, float z) - set the servo angles to immediately go to the requested point without caring what path the arm swings through to get there - faster but less predictable than gotoPoint
+* void moveTo(float x, float y, float z) - move in a straight line from the current point to the requested position
+* void snapTo(float x, float y, float z) - set the servo angles to immediately go to the requested point without caring what path the arm swings through to get there - faster but less predictable than moveTo
 * bool isReachable() - returns true if the point can theoretically be reached by the arm
 * float getX() - current x coordinate
 * float getY() - current y coordinate

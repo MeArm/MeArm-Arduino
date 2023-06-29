@@ -48,7 +48,7 @@ void loop() {
   if (abs(dz) < 1.5) dz = 0;
   
   if (!(dx == 0 && dy == 0 && dz == 0))
-    arm.goDirectlyTo(arm.getX() + dx, arm.getY() + dy, arm.getZ() + dz);
+    arm.snapTo(arm.getX() + dx, arm.getY() + dy, arm.getZ() + dz);
   
   if (dg < -3.0)
     arm.closeGripper();

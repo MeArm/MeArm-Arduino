@@ -4,9 +4,9 @@
  *   meArm arm;
  *   arm.begin(1, 10, 9, 6);
  *   arm.openGripper();
- *   arm.gotoPoint(-80, 100, 140);
+ *   arm.moveTo(-80, 100, 140);
  *   arm.closeGripper();
- *   arm.gotoPoint(70, 200, 10);
+ *   arm.moveTo(70, 200, 10);
  *   arm.openGripper();
  */
 #ifndef MEARM_H
@@ -26,21 +26,21 @@ struct ServoInfo {
 class meArm {
   public:
     //Full constructor uses calibration data, or can just give pins
-    meArm(int sweepMinBase=145, int sweepMaxBase=49, float angleMinBase=-pi/4, float angleMaxBase=pi/4,
+    meArm(int sweepMinBase=180, int sweepMaxBase=0, float angleMinBase=-pi/4, float angleMaxBase=pi/4,
       int sweepMinShoulder=118, int sweepMaxShoulder=22, float angleMinShoulder=pi/4, float angleMaxShoulder=3*pi/4,
       int sweepMinElbow=144, int sweepMaxElbow=36, float angleMinElbow=pi/4, float angleMaxElbow=-pi/4,
-      int sweepMinGripper=75, int sweepMaxGripper=115, float angleMinGripper=pi/2, float angleMaxGripper=0);
+      int sweepMinGripper=75, int sweepMaxGripper=180, float angleMinGripper=pi/2, float angleMaxGripper=0);
     //required before running
     void begin(int pinBase, int pinShoulder, int pinElbow, int pinGripper);
     void end();
     //Travel smoothly from current point to another point
-    void gotoPoint(float x, float y, float z);
+    void moveTo(float x, float y, float z);
     //Set servos to reach a certain point directly without caring how we get there 
-    void goDirectlyTo(float x, float y, float z);
+    void snapTo(float x, float y, float z);
 
     //Same as above but for cylindrical polar coodrinates
-    void gotoPointCylinder(float theta, float r, float z);
-    void goDirectlyToCylinder(float theta, float r, float z);
+    void moveToCylinder(float theta, float r, float z);
+    void snapToCylinder(float theta, float r, float z);
 
     //Grab something
     void openGripper();
