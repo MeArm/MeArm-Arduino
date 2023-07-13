@@ -12,8 +12,9 @@
  */
 #include <Arduino.h>
 #include "ik.h"
-#include "MeArm.h"
+#include "meArm.h"
 #include <Servo.h>
+//is this reading the changes
 
 bool setup_servo (ServoInfo& svo, const int n_min, const int n_max,
                   const float a_min, const float a_max)
