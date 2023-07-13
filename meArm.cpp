@@ -1,18 +1,20 @@
-/* meArm library York Hack Space May 2014
- * A simple control library for Phenoptix' meArm
+/* MeArm library based on the work by York Hack Space May 2014
+ * Officially co-opted as the go to IK and control library July 2023
+ * A simple control library for MeArm Robotics Classic MeArm Robot Arm
  * Usage:
- *   meArm arm;
+ *   MeArm arm;
  *   arm.begin(1, 10, 9, 6);
- *   arm.openGripper();
+ *   arm.openClaw();
  *   arm.moveTo(-80, 100, 140);
- *   arm.closeGripper();
+ *   arm.closeClaw();
  *   arm.moveTo(70, 200, 10);
- *   arm.openGripper();
+ *   arm.openClaw();
  */
 #include <Arduino.h>
 #include "ik.h"
-#include "meArm.h"
+#include "MeArm.h"
 #include <Servo.h>
+
 bool setup_servo (ServoInfo& svo, const int n_min, const int n_max,
                   const float a_min, const float a_max)
 {
@@ -40,41 +42,41 @@ int angle2pwm (const ServoInfo& svo, const float angle)
 }
 
 //Full constructor with calibration data
-meArm::meArm(int sweepMinBase, int sweepMaxBase, float angleMinBase, float angleMaxBase,
+MeArm::MeArm(int sweepMinBase, int sweepMaxBase, float angleMinBase, float angleMaxBase,
           int sweepMinShoulder, int sweepMaxShoulder, float angleMinShoulder, float angleMaxShoulder,
           int sweepMinElbow, int sweepMaxElbow, float angleMinElbow, float angleMaxElbow,
-          int sweepMinGripper, int sweepMaxGripper, float angleMinGripper, float angleMaxGripper) {
+          int sweepMinClaw, int sweepMaxClaw, float angleMinClaw, float angleMaxClaw) {
   //calroutine();
   setup_servo(_svoBase, sweepMinBase, sweepMaxBase, angleMinBase, angleMaxBase);
   setup_servo(_svoShoulder, sweepMinShoulder, sweepMaxShoulder, angleMinShoulder, angleMaxShoulder);
   setup_servo(_svoElbow, sweepMinElbow, sweepMaxElbow, angleMinElbow, angleMaxElbow);
-  setup_servo(_svoGripper, sweepMinGripper, sweepMaxGripper, angleMinGripper, angleMaxGripper);
+  setup_servo(_svoClaw, sweepMinClaw, sweepMaxClaw, angleMinClaw, angleMaxClaw);
 }
 
-void meArm::begin(int pinBase, int pinShoulder, int pinElbow, int pinGripper) {
+void MeArm::begin(int pinBase, int pinShoulder, int pinElbow, int pinClaw) {
   _pinBase = pinBase;
   _pinShoulder = pinShoulder;
   _pinElbow = pinElbow;
-  _pinGripper = pinGripper;
+  _pinClaw = pinClaw;
   _base.attach(_pinBase);
   _shoulder.attach(_pinShoulder);
   _elbow.attach(_pinElbow);
-  _gripper.attach(_pinGripper);
+  _claw.attach(_pinClaw);
 
-  //snapTo(0, 100, 50);
-  snapToCylinder(0, 100, 50);
-  openGripper();
+  //snapToXYZ(0, 100, 50);
+  snapTo(0, 100, 50);
+  openClaw();
 }
 
-void meArm::end() {
+void MeArm::end() {
   _base.detach();
   _shoulder.detach();
   _elbow.detach();
-  _gripper.detach();
+  _claw.detach();
 }
 
 //Set servos to reach a certain point directly without caring how we get there 
-void meArm::snapTo(float x, float y, float z) {
+void MeArm::snapToXYZ(float x, float y, float z) {
   float radBase,radShoulder,radElbow;
   if (solve(x, y, z, radBase, radShoulder, radElbow)) {
     _base.write(angle2pwm(_svoBase,radBase));
@@ -85,7 +87,7 @@ void meArm::snapTo(float x, float y, float z) {
 }
 
 //Travel smoothly from current point to another point
-void meArm::moveTo(float x, float y, float z) {
+void MeArm::moveToXYZ(float x, float y, float z) {
   //Starting points - current pos
   float x0 = _x; 
   float y0 = _y; 
@@ -96,12 +98,12 @@ void meArm::moveTo(float x, float y, float z) {
     snapTo(x0 + (x-x0)*i/dist, y0 + (y-y0) * i/dist, z0 + (z-z0) * i/dist);
     delay(50);
   }
-  snapTo(x, y, z);
+  snapToXYZ(x, y, z);
   delay(50);
 }
 
 //Get x and y from theta and r
-void meArm::polarToCartesian(float theta, float r, float& x, float& y){
+void MeArm::polarToCartesian(float theta, float r, float& x, float& y){
     _r = r;
     _t = theta;
     x = r*sin(theta);
@@ -109,51 +111,51 @@ void meArm::polarToCartesian(float theta, float r, float& x, float& y){
 }
 
 //Same as above but for cylindrical polar coodrinates
-void meArm::moveToCylinder(float theta, float r, float z){
+void MeArm::moveTo(float theta, float r, float z){
     float x, y;
     polarToCartesian(theta, r, x, y);
-    moveTo(x,y,z);
+    moveToXYZ(x,y,z);
 }
 
-void meArm::snapToCylinder(float theta, float r, float z){
+void MeArm::snapTo(float theta, float r, float z){
     float x, y;
     polarToCartesian(theta, r, x, y);
-    snapTo(x,y,z);
+    snapToXYZ(x,y,z);
 }
 
 //Check to see if possible
-bool meArm::isReachable(float x, float y, float z) {
+bool MeArm::isReachable(float x, float y, float z) {
   float radBase,radShoulder,radElbow;
   return (solve(x, y, z, radBase, radShoulder, radElbow));
 }
 
 //Grab something
-void meArm::openGripper() {
-  _gripper.write(angle2pwm(_svoGripper,pi/2));
+void MeArm::openClaw() {
+  _claw.write(angle2pwm(_svoClaw,pi/2));
   delay(300);
 }
 
 //Let go of something
-void meArm::closeGripper() {
-  _gripper.write(angle2pwm(_svoGripper,0));
+void MeArm::closeClaw() {
+  _claw.write(angle2pwm(_svoClaw,0));
   delay(300);
 }
 
 //Current x, y and z
-float meArm::getX() {
+float MeArm::getX() {
   return _x;
 }
-float meArm::getY() {
+float MeArm::getY() {
   return _y;
 }
-float meArm::getZ() {
+float MeArm::getZ() {
   return _z;
 }
 
 
-float meArm::getR() {
+float MeArm::getR() {
   return _r;
 }
-float meArm::getTheta() {
+float MeArm::getTheta() {
   return _t;
 }

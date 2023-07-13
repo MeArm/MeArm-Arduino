@@ -1,13 +1,14 @@
-/* meArm library York Hack Space May 2014
- * A simple control library for Phenoptix' meArm
+/* MeArm library based on the work by York Hack Space May 2014
+ * Officially co-opted as the go to IK and control library July 2023
+ * A simple control library for the MeArm Robotics MeArm Robot Arm
  * Usage:
- *   meArm arm;
+ *   MeArm arm;
  *   arm.begin(1, 10, 9, 6);
- *   arm.openGripper();
- *   arm.moveTo(-80, 100, 140);
- *   arm.closeGripper();
- *   arm.moveTo(70, 200, 10);
- *   arm.openGripper();
+ *   arm.openClaw();
+ *   arm.moveToXYZ(-80, 100, 140);
+ *   arm.closeClaw();
+ *   arm.moveToXYZ(70, 200, 10);
+ *   arm.openClaw();
  */
 #ifndef MEARM_H
 #define MEARM_H
@@ -23,45 +24,35 @@ struct ServoInfo {
     float zero;         // Theoretical PWM for zero angle
 };
 
-class meArm {
+class MeArm {
   public:
     //Full constructor uses calibration data, or can just give pins
-    meArm(int sweepMinBase=180, int sweepMaxBase=0, float angleMinBase=-pi/4, float angleMaxBase=pi/4,
+    MeArm(int sweepMinBase=180, int sweepMaxBase=0, float angleMinBase=-pi/4, float angleMaxBase=pi/4,
       int sweepMinShoulder=118, int sweepMaxShoulder=22, float angleMinShoulder=pi/4, float angleMaxShoulder=3*pi/4,
       int sweepMinElbow=144, int sweepMaxElbow=36, float angleMinElbow=pi/4, float angleMaxElbow=-pi/4,
-      int sweepMinGripper=75, int sweepMaxGripper=180, float angleMinGripper=pi/2, float angleMaxGripper=0);
+      int sweepMinClaw=75, int sweepMaxClaw=180, float angleMinClaw=pi/2, float angleMaxClaw=0);
     //required before running
-    void begin(int pinBase, int pinShoulder, int pinElbow, int pinGripper);
+    void begin(int pinBase, int pinShoulder, int pinElbow, int pinClaw);
     void end();
-    //Travel smoothly from current point to another point
-    void moveTo(float x, float y, float z);
-    //Set servos to reach a certain point directly without caring how we get there 
-    void snapTo(float x, float y, float z);
-
-    //Same as above but for cylindrical polar coodrinates
-    void moveToCylinder(float theta, float r, float z);
-    void snapToCylinder(float theta, float r, float z);
-
-    //Grab something
-    void openGripper();
-    //Let go of something
-    void closeGripper();
-    //Check to see if possible
-    bool isReachable(float x, float y, float z);
-    //Current x, y and z
-    float getX();
+    void moveTo(float theta, float r, float z);     //Travel smoothly from current point to another point in cylindrical polar coordinates
+    void moveToXYZ(float x, float y, float z);      //Same as above but for cartesian coodrinates
+    void snapTo(float theta, float r, float z);     //Set servos to reach a certain point directly without caring how we get there 
+    void snapToXYZ(float x, float y, float z);      //Same as above but for cartesian coodrinates
+    void openClaw();                                //Grab something
+    void closeClaw();                               //Let it go (don't hold it back anymore)
+    bool isReachable(float x, float y, float z);    //Check to see if possible
+    float getX(); //Current x, y and z
     float getY();
     float getZ();
-
     float getR();
     float getTheta();
   private:
     void polarToCartesian(float theta, float r, float& x, float& y);
     float _x, _y, _z;
     float _r, _t;
-    Servo _base, _shoulder, _elbow, _gripper;
-    ServoInfo _svoBase, _svoShoulder, _svoElbow, _svoGripper;
-    int _pinBase, _pinShoulder, _pinElbow, _pinGripper;
+    Servo _base, _shoulder, _elbow, _claw;
+    ServoInfo _svoBase, _svoShoulder, _svoElbow, _svoClaw;
+    int _pinBase, _pinShoulder, _pinElbow, _pinClaw;
 };
 
 #endif

@@ -1,24 +1,25 @@
 #######################################
-# Syntax Coloring Map For meArm library
+# Syntax Coloring Map For MeArm library
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-meArm	KEYWORD1
+MeArm	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
 begin	KEYWORD2
-openGripper	KEYWORD2
-closeGripper	KEYWORD2
-gotoPoint	KEYWORD2
-goDirectlyTo	KEYWORD2
-gotoPointCylinder	KEYWORD2
-goDirectlyToCylinder	KEYWORD2
+end	KEYWORD2
+openClaw	KEYWORD2
+closeClaw	KEYWORD2
+moveTo	KEYWORD2
+snapTo	KEYWORD2
+moveToXYZ	KEYWORD2
+snapToXYZ	KEYWORD2
 isReachable	KEYWORD2
 getX	KEYWORD2
 getY	KEYWORD2

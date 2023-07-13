@@ -1,6 +1,6 @@
-/* meArmIK - York Hackspace May 2014
+/* MeArmIK - York Hackspace May 2014
  * Inverse Kinematics solver for three degrees of freedom
- * created for Phenoptix' meArm robot arm
+ * created for MeArm Robotics Class MeArm Robot Arm
  */
 #ifndef IK_H_INCLUDED
 #define IK_H_INCLUDED

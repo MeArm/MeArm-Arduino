@@ -1,18 +1,18 @@
-/* meArm Wii Classic game pad - York Hackspace May 2014
+/* MeArm Wii Classic game pad - York Hackspace May 2014
  * Using inverse kinematics with Wii Classic game controller
- * First stick moves gripper forwards, backwards, left and right
- * Second stick moves gripper up and down (and left and right again).
- * Shoulder buttons or A & B buttons open and close the gripper.
+ * First stick moves claw forwards, backwards, left and right
+ * Second stick moves claw up and down (and left and right again).
+ * Shoulder buttons or A & B buttons open and close the claw.
  * The home button returns to starting point.
  * 
- * Uses meArm library by York Hack Space from https://github.com/yorkhackspace/meArm
+ * Uses MeArm library by York Hack Space from https://github.com/yorkhackspace/meArm
  * Uses ClassicController library from https://github.com/wayneandlayne/Video-Game-Shield
  *
  * Connect the Wii Classic gamepad via a breakout such as
  * http://www.phenoptix.com/collections/breakout-board/products/wiichuck-a-wii-nunchuck-break-out-board-by-seeed-studio
  *
  * Pins:
- * Arduino    WiiChuck   Base   Shoulder  Elbow    Gripper
+ * Arduino    WiiChuck   Base   Shoulder  Elbow    Claw
  *    GND         -     Brown     Brown   Brown     Brown
  *     5V         +       Red       Red     Red       Red
  *     A4         d
@@ -22,20 +22,20 @@
  *      9                                Yellow
  *      6                                          Yellow
  */
-#include "meArm.h"
+#include "MeArm.h"
 #include <Servo.h>
 #include <ClassicController.h>
 
 int basePin = 11;
 int shoulderPin = 10;
 int elbowPin = 9;
-int gripperPin = 6;
+int clawPin = 6;
 
-meArm arm;
+MeArm arm;
 ClassicController cc;
 
 void setup() {
-  arm.begin(basePin, shoulderPin, elbowPin, gripperPin);
+  arm.begin(basePin, shoulderPin, elbowPin, clawPin);
   cc.begin(WII_PLAYER_1);
   cc.joy_left_set_scaled_min_max(0, 99, 0, 99);
   cc.joy_right_set_scaled_min_max(0, 99, 0, 99);
@@ -61,14 +61,14 @@ void loop() {
   else if (cc.joy_right_down())
     dz = -5.0;
   if (cc.button_b() || cc.shoulder_left() > 16)
-    arm.openGripper();
+    arm.openClaw();
   else if (cc.button_a() || cc.shoulder_right() > 16)
-    arm.closeGripper();
+    arm.closeClaw();
   if (cc.button_home()) {
-    arm.moveTo(0, 100, 50);
+    arm.moveToXYZ(0, 100, 50);
   } 
   if (!(dx == 0 && dy == 0 && dz == 0))
-    arm.snapTo(arm.getX() + dx, arm.getY() + dy, arm.getZ() + dz);
+    arm.snapToXYZ(arm.getX() + dx, arm.getY() + dy, arm.getZ() + dz);
   
   delay(50);
 }
