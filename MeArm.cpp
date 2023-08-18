@@ -12,7 +12,7 @@
  */
 #include <Arduino.h>
 #include "ik.h"
-#include "meArm.h"
+#include "MeArm.h"
 #include <Servo.h>
 //is this reading the changes
 
@@ -96,7 +96,7 @@ void MeArm::moveToXYZ(float x, float y, float z) {
   float dist = sqrt((x0-x)*(x0-x)+(y0-y)*(y0-y)+(z0-z)*(z0-z));
   int step = 10;
   for (int i = 0; i<dist; i+= step) {
-    snapTo(x0 + (x-x0)*i/dist, y0 + (y-y0) * i/dist, z0 + (z-z0) * i/dist);
+    snapToXYZ(x0 + (x-x0)*i/dist, y0 + (y-y0) * i/dist, z0 + (z-z0) * i/dist);
     delay(50);
   }
   snapToXYZ(x, y, z);
