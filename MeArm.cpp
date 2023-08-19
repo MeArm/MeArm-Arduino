@@ -39,7 +39,7 @@ bool setup_servo (ServoInfo& svo, const int n_min, const int n_max,
 int angle2pwm (const ServoInfo& svo, const float angle)
 {
     float pwm = 0.5f + svo.zero + svo.gain * angle;
-    return int(pwm);
+    return int(pwm*(MAX_PULSE_WIDTH-MIN_PULSE_WIDTH)/180.0)+MIN_PULSE_WIDTH; // convert 0-180 to microseconds
 }
 
 //Full constructor with calibration data
