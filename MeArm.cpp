@@ -12,7 +12,7 @@
  */
 #include <Arduino.h>
 #include "ik.h"
-#include "meArm.h"
+#include "MeArm.h"
 #include <Servo.h>
 //is this reading the changes
 
@@ -39,7 +39,7 @@ bool setup_servo (ServoInfo& svo, const int n_min, const int n_max,
 int angle2pwm (const ServoInfo& svo, const float angle)
 {
     float pwm = 0.5f + svo.zero + svo.gain * angle;
-    return int(pwm);
+    return int(pwm*(MAX_PULSE_WIDTH-MIN_PULSE_WIDTH)/180.0)+MIN_PULSE_WIDTH; // convert 0-180 to microseconds
 }
 
 //Full constructor with calibration data
@@ -96,7 +96,7 @@ void MeArm::moveToXYZ(float x, float y, float z) {
   float dist = sqrt((x0-x)*(x0-x)+(y0-y)*(y0-y)+(z0-z)*(z0-z));
   int step = 10;
   for (int i = 0; i<dist; i+= step) {
-    snapTo(x0 + (x-x0)*i/dist, y0 + (y-y0) * i/dist, z0 + (z-z0) * i/dist);
+    snapToXYZ(x0 + (x-x0)*i/dist, y0 + (y-y0) * i/dist, z0 + (z-z0) * i/dist);
     delay(50);
   }
   snapToXYZ(x, y, z);
